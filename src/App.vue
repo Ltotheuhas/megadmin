@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dark>
-      <v-toolbar-title>
+      <v-toolbar-title class="d-flex">
         <router-link to="/" style="color: white; text-decoration: none;">
           Admin Interface
         </router-link>
