@@ -8,16 +8,16 @@
           <v-col v-for="(obj, index) in objects" :key="index" cols="12" md="6" lg="4" xl="3" xxl="2">
             <v-card>
               <v-row class="pa-2">
-                <v-col cols="4" class="d-flex align-center justify-center pa-6">
+                <v-col cols="4" class="d-flex align-center justify-center px-6">
                   <v-img v-if="obj.type === 'image'" :src="`${apiUrl}${obj.filePath}`" max-height="100" contain></v-img>
                 </v-col>
-                <v-col cols="8">
-                  <v-card-title>
+                <v-col cols="8" class="pl-0">
+                  <v-card-title class="pl-0">
                     {{ extractFileName(obj.filePath) }}
                     <br />
                     <small>Uploaded {{ formatDate(extractTimestamp(obj.filePath)) }}</small>
                   </v-card-title>
-                  <v-card-actions>
+                  <v-card-actions class="pl-0">
                     <v-btn color="red" @click="confirmDelete(obj._id)">Delete</v-btn>
                     <v-btn color="blue" @click="navigateToEdit(obj._id)">Edit</v-btn>
                   </v-card-actions>
