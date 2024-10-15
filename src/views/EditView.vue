@@ -2,14 +2,16 @@
     <v-container>
         <v-row>
             <v-col cols="12">
-                <h1>Edit Object</h1>
-                <h3 v-if="object && !loading" class="mb-2">Uploaded {{ formatDate(extractTimestamp(object.filePath)) }}
-                </h3>
+                <h1 class="mb-2">Edit Object</h1>
+                <h2 v-if="object && !loading">{{ extractFileName(object.filePath) }}
+                </h2>
+                <h4 v-if="object && !loading" class="mb-2">Uploaded {{ formatDate(extractTimestamp(object.filePath)) }}
+                </h4>
                 <v-alert v-if="error" type="error" dismissible>{{ error }}</v-alert>
                 <v-alert v-if="success" type="success" dismissible>{{ success }}</v-alert>
                 <v-progress-circular v-if="loading" indeterminate color="blue"></v-progress-circular>
-                <v-img v-if="object && !loading && object.type === 'image'" :src="`${apiUrl}${object.filePath}`"
-                    class="mt-3 mb-6" max-height="500" contain></v-img>
+                <v-img v-if="object && !loading && (object.type === 'image' || object.type === 'gif')"
+                    :src="`${apiUrl}${object.filePath}`" class="mt-3 mb-6" max-height="500" contain></v-img>
                 <v-form v-if="object && !loading" @submit.prevent="updateObject">
                     <v-text-field v-model="object.position.x" label="Position X" type="number"></v-text-field>
                     <v-text-field v-model="object.position.y" label="Position Y" type="number"></v-text-field>
@@ -57,6 +59,12 @@ export default {
                 this.success = null; // Clear any previous success message
                 this.error = 'Failed to update object';
             }
+        },
+        extractFileName(filePath) {
+            const filenameWithTimestamp = filePath.split('/').pop();
+            const indexOfFirstHyphen = filenameWithTimestamp.indexOf('-');
+            const filename = filenameWithTimestamp.substring(indexOfFirstHyphen + 1);
+            return filename;
         },
         extractTimestamp(filePath) {
             const filenameWithTimestamp = filePath.split('/').pop();

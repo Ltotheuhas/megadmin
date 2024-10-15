@@ -9,7 +9,8 @@
             <v-card>
               <v-row class="pa-2">
                 <v-col cols="4" class="d-flex align-center justify-center px-6">
-                  <v-img v-if="obj.type === 'image'" :src="`${apiUrl}${obj.filePath}`" max-height="100" contain></v-img>
+                  <v-img v-if="obj.type === 'image' || obj.type === 'gif'" :src="`${apiUrl}${obj.filePath}`"
+                    max-height="100" contain></v-img>
                 </v-col>
                 <v-col cols="8" class="pl-0">
                   <v-card-title class="pl-0">
