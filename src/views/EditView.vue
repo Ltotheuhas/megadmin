@@ -3,22 +3,30 @@
         <v-row>
             <v-col cols="12">
                 <h1 class="mb-2">Edit Object</h1>
-                <h2 v-if="object && !loading">{{ extractFileName(object.filePath) }}
-                </h2>
-                <h4 v-if="object && !loading" class="mb-2">Uploaded {{ formatDate(extractTimestamp(object.filePath)) }}
+                <h2 v-if="object && !loading">{{ extractFileName(object.filePath) }}</h2>
+                <h4 v-if="object && !loading" class="mb-2">
+                    Uploaded {{ formatDate(extractTimestamp(object.filePath)) }}
                 </h4>
                 <v-alert v-if="error" type="error" dismissible>{{ error }}</v-alert>
                 <v-alert v-if="success" type="success" dismissible>{{ success }}</v-alert>
                 <v-progress-circular v-if="loading" indeterminate color="blue"></v-progress-circular>
+
+                <!-- Display Image or GIF -->
                 <v-img v-if="object && !loading && (object.type === 'image' || object.type === 'gif')"
                     :src="`${apiUrl}${object.filePath}`" class="mt-3 mb-6" max-height="500" contain></v-img>
+
+                <!-- Display 3D Model -->
+                <!-- Display 3D Model -->
+                <ModelViewer v-if="object && !loading && object.type === 'model'"
+                    :file-path="`${apiUrl}${object.filePath}`" />
+
                 <v-form v-if="object && !loading" @submit.prevent="updateObject">
                     <v-text-field v-model="object.position.x" label="Position X" type="number"></v-text-field>
-                    <v-text-field v-model="object.position.y" label="Position Y" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.position.y" label="Position Y" type="number"></v-text-field>
                     <v-text-field v-model="object.position.z" label="Position Z" type="number"></v-text-field>
-                    <v-text-field v-model="object.rotation._x" label="Rotation X" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._x" label="Rotation X" type="number"></v-text-field>
                     <v-text-field v-model="object.rotation._y" label="Rotation Y" type="number"></v-text-field>
-                    <v-text-field v-model="object.rotation._z" label="Rotation Z" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._z" label="Rotation Z" type="number"></v-text-field>
                     <v-btn color="blue" type="submit">Save Changes</v-btn>
                 </v-form>
             </v-col>
@@ -28,16 +36,20 @@
 
 <script>
 import { fetchObjectById, updateObject } from '@/apiService.js';
+import ModelViewer from '@/components/ModelViewer.vue'; // Import ModelViewer component
 
 export default {
     props: ['id'],
+    components: {
+        ModelViewer
+    },
     data() {
         return {
             object: null,
             loading: true,
             error: null,
             success: null,
-            apiUrl: import.meta.env.VITE_APP_API_URL,
+            apiUrl: import.meta.env.VITE_APP_API_URL
         };
     },
     async created() {
@@ -54,9 +66,9 @@ export default {
             try {
                 await updateObject(this.object._id, this.object);
                 this.success = 'Changes saved successfully';
-                this.error = null; // Clear any previous errors
+                this.error = null;
             } catch (error) {
-                this.success = null; // Clear any previous success message
+                this.success = null;
                 this.error = 'Failed to update object';
             }
         },
@@ -83,9 +95,5 @@ export default {
             });
         }
     }
-}
+};
 </script>
-
-<style scoped>
-/* Add any additional styling here */
-</style>

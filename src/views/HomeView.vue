@@ -11,6 +11,7 @@
                 <v-col cols="4" class="d-flex align-center justify-center px-6">
                   <v-img v-if="obj.type === 'image' || obj.type === 'gif'" :src="`${apiUrl}${obj.filePath}`"
                     max-height="100" contain></v-img>
+                  <ModelViewer v-else-if="obj.type === 'model'" style="height: 100px; width: auto;" :file-path="`${apiUrl}${obj.filePath}`" />
                 </v-col>
                 <v-col cols="8" class="pl-0">
                   <v-card-title class="pl-0">
@@ -47,8 +48,12 @@
 
 <script>
 import { fetchObjects, deleteObject } from '@/apiService.js';
+import ModelViewer from '@/components/ModelViewer.vue';
 
 export default {
+  components: {
+    ModelViewer
+  },
   data() {
     return {
       objects: [],
