@@ -2,16 +2,20 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 class="mb-2">Uploaded Files</h1>
+        <h1 class="mb-2">Uploaded Files
+          <span v-if="!loading">(Total Size: {{ totalFileSize }})</span>
+        </h1>
         <v-alert v-if="error" type="error">{{ error }}</v-alert>
-        <v-row>
+        <v-progress-circular v-if="loading" indeterminate color="blue" size="48"></v-progress-circular>
+        <v-row v-else>
           <v-col v-for="(obj, index) in objects" :key="index" cols="12" md="6" lg="4" xl="3" xxl="2">
             <v-card>
               <v-row class="pa-2">
                 <v-col cols="4" class="d-flex align-center justify-center px-6">
                   <v-img v-if="obj.type === 'image' || obj.type === 'gif'" :src="`${apiUrl}${obj.filePath}`"
                     max-height="100" contain></v-img>
-                  <ModelViewer v-else-if="obj.type === 'model'" style="height: 100px; width: auto;" :file-path="`${apiUrl}${obj.filePath}`" />
+                  <ModelViewer v-else-if="obj.type === 'model'" style="height: 100px; width: auto;"
+                    :file-path="`${apiUrl}${obj.filePath}`" />
                 </v-col>
                 <v-col cols="8" class="pl-0">
                   <v-card-title class="pl-0">
@@ -61,6 +65,7 @@ export default {
       dialog: false,
       deleteId: null,
       apiUrl: import.meta.env.VITE_APP_API_URL,
+      loading: true
     };
   },
   created() {
@@ -68,10 +73,13 @@ export default {
   },
   methods: {
     async loadObjects() {
+      this.loading = true;
       try {
         this.objects = await fetchObjects();
       } catch (error) {
         this.error = 'Failed to load objects';
+      } finally {
+        this.loading = false;
       }
     },
     confirmDelete(id) {
@@ -105,13 +113,23 @@ export default {
     formatDate(timestamp) {
       const date = new Date(timestamp);
       return date.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    },
+    formatFileSize(size) {
+      if (size == null) return 'Unknown';
+      const i = Math.floor(Math.log(size) / Math.log(1024));
+      return (size / Math.pow(1024, i)).toFixed(2) + ' ' + ['B', 'KB', 'MB', 'GB', 'TB'][i];
+    }
+  },
+  computed: {
+    totalFileSize() {
+      const totalSize = this.objects.reduce((sum, obj) => sum + (obj.size || 0), 0);
+      return this.formatFileSize(totalSize);
     }
   }
 };
 </script>
 
 <style scoped>
-/* Ensure image has a max-width for better control on mobile */
 .v-img {
   max-width: 100%;
   height: auto;

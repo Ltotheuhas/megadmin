@@ -3,7 +3,10 @@
         <v-row>
             <v-col cols="12">
                 <h1 class="mb-2">Edit Object</h1>
-                <h2 v-if="object && !loading">{{ extractFileName(object.filePath) }}</h2>
+                <h2 v-if="object && !loading">
+                    {{ extractFileName(object.filePath) }}
+                    <span v-if="object.size">({{ formattedFileSize }})</span>
+                </h2>
                 <h4 v-if="object && !loading" class="mb-2">
                     Uploaded {{ formatDate(extractTimestamp(object.filePath)) }}
                 </h4>
@@ -14,19 +17,21 @@
                 <!-- Display Image or GIF -->
                 <v-img v-if="object && !loading && (object.type === 'image' || object.type === 'gif')"
                     :src="`${apiUrl}${object.filePath}`" class="mt-3 mb-6" max-height="500" contain></v-img>
-
-                <!-- Display 3D Model -->
+                    
                 <!-- Display 3D Model -->
                 <ModelViewer v-if="object && !loading && object.type === 'model'"
                     :file-path="`${apiUrl}${object.filePath}`" />
 
                 <v-form v-if="object && !loading" @submit.prevent="updateObject">
                     <v-text-field v-model="object.position.x" label="Position X" type="number"></v-text-field>
-                    <v-text-field v-if="object.type !== 'model'" v-model="object.position.y" label="Position Y" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.position.y" label="Position Y"
+                        type="number"></v-text-field>
                     <v-text-field v-model="object.position.z" label="Position Z" type="number"></v-text-field>
-                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._x" label="Rotation X" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._x" label="Rotation X"
+                        type="number"></v-text-field>
                     <v-text-field v-model="object.rotation._y" label="Rotation Y" type="number"></v-text-field>
-                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._z" label="Rotation Z" type="number"></v-text-field>
+                    <v-text-field v-if="object.type !== 'model'" v-model="object.rotation._z" label="Rotation Z"
+                        type="number"></v-text-field>
                     <v-btn color="blue" type="submit">Save Changes</v-btn>
                 </v-form>
             </v-col>
@@ -55,6 +60,7 @@ export default {
     async created() {
         try {
             this.object = await fetchObjectById(this.id);
+            console.log('Fetched object:', this.object);
         } catch (error) {
             this.error = 'Failed to load object';
         } finally {
@@ -93,6 +99,16 @@ export default {
                 minute: '2-digit',
                 second: '2-digit'
             });
+        },
+        formatFileSize(size) {
+            if (size == null) return 'Unknown';
+            const i = Math.floor(Math.log(size) / Math.log(1024));
+            return (size / Math.pow(1024, i)).toFixed(2) + ' ' + ['B', 'KB', 'MB', 'GB', 'TB'][i];
+        }
+    },
+    computed: {
+        formattedFileSize() {
+            return this.formatFileSize(this.object?.size);
         }
     }
 };
