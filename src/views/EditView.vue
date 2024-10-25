@@ -17,7 +17,7 @@
                 <!-- Display Image or GIF -->
                 <v-img v-if="object && !loading && (object.type === 'image' || object.type === 'gif')"
                     :src="`${apiUrl}${object.filePath}`" class="mt-3 mb-6" max-height="500" contain></v-img>
-                    
+
                 <!-- Display 3D Model -->
                 <ModelViewer v-if="object && !loading && object.type === 'model'"
                     :file-path="`${apiUrl}${object.filePath}`" />
@@ -60,7 +60,6 @@ export default {
     async created() {
         try {
             this.object = await fetchObjectById(this.id);
-            console.log('Fetched object:', this.object);
         } catch (error) {
             this.error = 'Failed to load object';
         } finally {
