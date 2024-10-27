@@ -2,8 +2,10 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 class="mb-2">Uploaded Files
-          <span v-if="!loading">(Total Size: {{ totalFileSize }})</span>
+        <h1 class="mb-2">Uploaded Files <br>
+          <span v-if="!loading">
+            {{ objectCount }} Items, Total Size: {{ totalFileSize }}
+          </span>
         </h1>
         <v-alert v-if="error" type="error">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="blue" size="48"></v-progress-circular>
@@ -124,6 +126,9 @@ export default {
     totalFileSize() {
       const totalSize = this.objects.reduce((sum, obj) => sum + (obj.size || 0), 0);
       return this.formatFileSize(totalSize);
+    },
+    objectCount() {
+      return this.objects.length;
     }
   }
 };
